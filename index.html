@@ -202,7 +202,7 @@
                     alert("외출이 3시간 이상이었습니다.\n경고 1회 추가.");
 
                     // 경고 3회 → 2주 금지
-                    if (data.warnings >= 1/600) {
+                    if (data.warnings >= 3) {
                         data.warnings = 0;
                         data.bannedUntil = now + 14 * 24 * 60 * 60 * 1000; // 2주
                         data.status = "퇴실";
