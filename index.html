@@ -176,7 +176,7 @@
                 const diffMs  = now - data.lastOutTime;
                 const diffHr  = diffMs / (1000 * 60 * 60);
 
-                if (diffHr >= 3) {
+                if (diffHr >= 1/600) {
                     data.warnings += 1;
                     alert("외출 시간이 3시간을 초과했습니다.\n경고 1회를 부여합니다.");
                 }
