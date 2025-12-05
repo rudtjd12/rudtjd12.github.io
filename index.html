@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <style>
+        /* [스타일 정의] */
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             margin: 0;
@@ -33,11 +34,29 @@
             margin-top: 40px;
             text-align: center;
             padding-bottom: 20px;
+            width: 100%;
+            max-width: 360px;
         }
+        
+        /* [추가됨] 롤링 문구 스타일 */
+        .nudge-text {
+            font-size: 13px;
+            color: #666;      
+            font-weight: 600; 
+            margin-bottom: 12px;
+            min-height: 20px; 
+            line-height: 1.4;
+            padding: 0 10px;
+            word-break: keep-all;
+            transition: opacity 0.3s;
+        }
+
         .bottom-logo-img {
-            max-width: 200px;
+            max-width: 180px;
             height: auto;
             display: block;
+            margin: 0 auto;
+            opacity: 0.8;
         }
 
         .card {
@@ -50,177 +69,172 @@
             width: 100%;
             margin-bottom: auto; 
         }
-        #id-card, #seat-card {
-             margin-top: auto;
-        }
+        #id-card, #seat-card { margin-top: auto; }
 
         .seat-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
+            font-size: 20px; font-weight: 700; margin-bottom: 12px;
         }
         .status {
-            font-size: 18px;
-            margin: 16px 0;
+            font-size: 18px; margin: 16px 0;
         }
-        .status span {
-            font-weight: 700;
-        }
+        .status span { font-weight: 700; }
         .status-enter { color: #2e7d32; } 
         .status-out { color: #f9a825; }   
         
         .student-line {
-            font-size: 16px;
-            margin-top: 4px;
-            border-top: 1px solid #ddd;
-            padding-top: 8px;
-            margin-bottom: 12px;
+            font-size: 16px; margin-top: 4px; border-top: 1px solid #ddd;
+            padding-top: 8px; margin-bottom: 12px;
         }
         .student-line span { font-weight: 600; color: #333; }
 
         .timer-box {
-            background: #ffebee;
-            color: #c62828;
-            padding: 8px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            font-weight: bold;
+            background: #ffebee; color: #c62828; padding: 8px;
+            border-radius: 6px; margin-bottom: 15px; font-weight: bold;
             display: none; 
         }
 
         .warning-box {
-            font-size: 13px;
-            color: #d32f2f;
-            margin-bottom: 10px;
-            background: #fff3e0;
-            padding: 6px;
-            border-radius: 4px;
+            font-size: 13px; color: #d32f2f; margin-bottom: 10px;
+            background: #fff3e0; padding: 6px; border-radius: 4px;
             display: none;
         }
 
         .btn-row {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: wrap;
+            display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
         }
         button {
-            padding: 8px 14px;
-            font-size: 15px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: background 0.2s;
+            padding: 8px 14px; font-size: 15px; border-radius: 8px;
+            border: none; cursor: pointer; transition: background 0.2s;
         }
         .btn-primary { background: #1976d2; color: #fff; }
         .btn-secondary { background: #eeeeee; color: #333; }
         .btn-danger { background: #d32f2f; color: #fff; }
+        
+        /* 테스트용 버튼 (숨김 가능) */
         .btn-test { background: #666; color: #fff; font-size: 11px; margin-top: 20px; }
 
         #idInput {
-            width: 100%;
-            padding: 8px 10px;
-            font-size: 16px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
+            width: 100%; padding: 8px 10px; font-size: 16px; margin-bottom: 12px;
+            border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;
         }
 
-        .info {
-            margin-top: 10px;
-            font-size: 11px;
-            color: #666;
-        }
-        .error {
-            color: #c62828;
-            font-size: 14px;
-            margin-top: 8px;
-            display: none;
-        }
+        .info { margin-top: 10px; font-size: 11px; color: #666; }
+        .error { color: #c62828; font-size: 14px; margin-top: 8px; display: none; }
     </style>
 </head>
 <body>
 
-<div class="app-header">
-    <h1 class="app-title">세종대학교 학술정보원 열람실</h1>
-    <p class="app-subtitle">스마트 좌석 배정 시스템</p>
-</div>
-
-<div class="card" id="id-card">
-    <div id="seat-title-form" class="seat-title">좌석 정보 불러오는 중...</div>
-    
-    <input id="idInput" type="text" maxlength="8" inputmode="numeric" placeholder="학번 8자리를 입력하세요" />
-    
-    <button id="idSubmit" class="btn-primary">로그인 / 좌석 배정</button>
-    <div id="idError" class="error"></div>
-    <div class="info">학번을 입력하면 해당 학생의 대시보드로 이동합니다.</div>
-</div>
-
-<div class="card" id="seat-card" style="display:none;">
-    <div id="seat-title" class="seat-title"></div>
-
-    <div class="student-line">
-        사용자: <span id="student-id-text">-</span>
+    <div class="app-header">
+        <h1 class="app-title">세종대학교 학술정보원 열람실</h1>
+        <p class="app-subtitle">스마트 좌석 배정 시스템</p>
     </div>
 
-    <div id="warning-display" class="warning-box">
-        ⚠️ 누적 경고: <span id="warning-count">0</span>회 (3회시 강제 퇴실)
+    <div class="card" id="id-card">
+        <div id="seat-title-form" class="seat-title">좌석 정보 불러오는 중...</div>
+        
+        <input id="idInput" type="text" maxlength="8" inputmode="numeric" placeholder="학번 8자리를 입력하세요" />
+        
+        <button id="idSubmit" class="btn-primary">로그인 / 좌석 배정</button>
+        <div id="idError" class="error"></div>
+        <div class="info">세종대생 98%가 지키는 매너,<br>퇴실 처리는 필수입니다.</div>
     </div>
 
-    <div id="status" class="status">상태: <span>입실 중</span></div>
+    <div class="card" id="seat-card" style="display:none;">
+        <div id="seat-title" class="seat-title"></div>
 
-    <div id="out-timer-box" class="timer-box">
-        외출 시간: <span id="timer-text">00:00:00</span>
-        <div style="font-size:11px; font-weight:normal; margin-top:4px;">(3시간 초과 시 경고 1회)</div>
-    </div>
-
-    <div class="btn-row">
-        <div id="controls-in" style="display:block;">
-            <button class="btn-secondary" id="btn-go-out">외출 하기</button>
-            <button class="btn-danger" id="btn-leave">퇴실 (사용 종료)</button>
+        <div class="student-line">
+            사용자: <span id="student-id-text">-</span>
         </div>
-        <div id="controls-out" style="display:none;">
-            <button class="btn-primary" id="btn-return">복귀 (외출 종료)</button>
-            <button class="btn-danger" id="btn-leave-out">바로 퇴실</button>
+
+        <div id="warning-display" class="warning-box">
+            ⚠️ 누적 경고: <span id="warning-count">0</span>회 (3회시 강제 퇴실)
         </div>
+
+        <div id="status" class="status">상태: <span>입실 중</span></div>
+
+        <div id="out-timer-box" class="timer-box">
+            외출 시간: <span id="timer-text">00:00:00</span>
+            <div style="font-size:11px; font-weight:normal; margin-top:4px;">
+                (3시간 초과 시 경고 1회)
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <div id="controls-in" style="display:block;">
+                <button class="btn-secondary" id="btn-go-out">외출 하기</button>
+                <button class="btn-danger" id="btn-leave">퇴실 (사용 종료)</button>
+            </div>
+            <div id="controls-out" style="display:none;">
+                <button class="btn-primary" id="btn-return">복귀 (외출 종료)</button>
+                <button class="btn-danger" id="btn-leave-out">바로 퇴실</button>
+            </div>
+        </div>
+
+        <button id="btn-test-add-time" class="btn-test" style="display:none;">
+            [테스트] 외출 시간 +3시간 추가
+        </button>
+
+        <div class="info">퇴실 시 초기 화면으로 돌아갑니다.</div>
     </div>
 
-    <button id="btn-test-add-time" class="btn-test" style="display:none;">
-        [테스트] 외출 시간 +3시간 추가
-    </button>
-
-    <div class="info">퇴실 시 초기 화면으로 돌아갑니다.</div>
-</div>
-
-<div class="bottom-footer">
-    <img src="Sejong-University.png" alt="Sejong University Logo" class="bottom-logo-img" />
-</div>
+    <div class="bottom-footer">
+        <div id="footer-msg" class="nudge-text"></div>
+        
+        <img src="Sejong-University.png" alt="Sejong University Logo" class="bottom-logo-img" />
+    </div>
 
 
 <script>
-    // --- 설정 ---
-    const WARNING_LIMIT_MS = 3 * 60 * 60 * 1000; // 3시간
-    const BAN_DURATION_MS = 14 * 24 * 60 * 60 * 1000; // 2주
+    // ============================================================
+    // [설정] 상수는 여기서 관리하세요
+    // ============================================================
+    const WARNING_LIMIT_MS = 3 * 60 * 60 * 1000; // 3시간 (외출 제한)
+    const BAN_DURATION_MS = 14 * 24 * 60 * 60 * 1000; // 2주 (이용 정지)
+    
+    // [설정] 하단 롤링 문구 리스트 (원하는 만큼 추가하세요)
+    const nudgeMessages = [
+        "세종대생 95%는 외출 3시간 약속을 정확히 지킵니다.",
+        "지금 당신의 배려가, 도서관 문화를 만듭니다.",
+        "빈자리는 짐이 아니라, 다음 사람에게 양보해 주세요.",
+        "지난달, 1,200명의 학우가 퇴실 버튼을 눌러 배려했습니다.",
+        "이 자리는 내일의 당신이 다시 앉고 싶어 할 자리입니다."
+    ];
 
-    // --- 1. 접속 정보 및 중복 착석 방지 로직 (가장 먼저 실행) ---
+    // ============================================================
+    // [로직 1] 롤링 문구 실행 (C언어 배열 순회와 동일)
+    // ============================================================
+    let msgIndex = 0;
+    const msgElement = document.getElementById("footer-msg");
+
+    function rotateMessage() {
+        if(nudgeMessages.length > 0) {
+            msgElement.textContent = nudgeMessages[msgIndex];
+            // 0 -> 1 -> 2 -> ... -> 0 (무한 반복)
+            msgIndex = (msgIndex + 1) % nudgeMessages.length;
+        }
+    }
+    // 최초 실행 및 4초마다 반복
+    rotateMessage(); 
+    setInterval(rotateMessage, 4000);
+
+
+    // ============================================================
+    // [로직 2] 접속 정보 확인 및 중복 로그인 방지
+    // ============================================================
     const params = new URLSearchParams(window.location.search);
     const seatNum = params.get("seat");
-
-    // 이 기기가 현재 사용 중인 좌석 번호를 가져옴
     const activeSeat = localStorage.getItem("device_active_seat");
 
-    // 만약 사용 중인 좌석이 있는데, 지금 들어온 URL의 좌석 번호와 다르다면?
+    // "다른 자리(1번) 로그인 중인데, 지금 2번 자리 주소로 들어왔네? -> 튕겨내기"
     if (activeSeat && seatNum && activeSeat !== seatNum) {
         alert(`🚫 오류: 이미 ${activeSeat}번 좌석을 이용 중입니다!\n\n해당 좌석 대시보드로 이동합니다.`);
-        // 강제로 원래 좌석 페이지로 이동
         window.location.href = `?seat=${activeSeat}`;
-        // 아래 코드 실행 방지를 위해 에러 발생 (의도적)
-        throw new Error("Redirecting to active seat...");
+        throw new Error("Redirecting..."); // 스크립트 강제 중단
     }
-    // ---------------------------------------------------------
 
-    // DOM 요소
+    // ============================================================
+    // [로직 3] DOM 요소 가져오기 (변수 연결)
+    // ============================================================
     const idCard = document.getElementById("id-card");
     const seatCard = document.getElementById("seat-card");
     const idInputEl = document.getElementById("idInput");
@@ -241,6 +255,9 @@
     let currentId = "";
     let timerInterval = null;
 
+    // ============================================================
+    // [로직 4] 초기 화면 세팅
+    // ============================================================
     if (!seatNum) {
         seatTitleFormEl.textContent = "좌석 번호 오류";
         idErrorEl.style.display = "block";
@@ -250,71 +267,89 @@
         seatTitleFormEl.textContent = `${seatNum}번 좌석 로그인`;
         seatTitleEl.textContent = `${seatNum}번 좌석 관리`;
 
-        // 해당 좌석에 저장된 정보가 있는지 확인
+        // 이 자리에 누가 앉아있다고 저장되어 있나?
         const savedId = localStorage.getItem(`seat_${seatNum}_studentId`);
         if (savedId) {
             login(savedId);
         }
     }
 
-    // --- 이벤트 리스너 ---
+    // ============================================================
+    // [로직 5] 이벤트 리스너 (버튼 클릭 동작)
+    // ============================================================
+    
+    // 1. 로그인 버튼
     document.getElementById("idSubmit").addEventListener("click", () => {
         const inputId = idInputEl.value.trim();
         
-        if (!inputId) {
-            showError("학번을 입력해주세요.");
-            return;
-        }
-
-        // 숫자만 8자리인지 확인
-        const idPattern = /^\d{8}$/;
-        if (!idPattern.test(inputId)) {
-            showError("학번은 숫자 8자리여야 합니다.");
-            return;
-        }
+        if (!inputId) { showError("학번을 입력해주세요."); return; }
+        if (!/^\d{8}$/.test(inputId)) { showError("학번은 숫자 8자리여야 합니다."); return; }
         
+        // 블랙리스트 확인
         const banInfo = getStudentBanInfo(inputId);
         if (banInfo.isBanned) {
             showError(`이용 정지된 사용자입니다.\n해제일: ${banInfo.date}`);
             return;
         }
 
-        // 로그인 성공 시 로컬스토리지 저장
+        // 로그인 처리
         localStorage.setItem(`seat_${seatNum}_studentId`, inputId);
-        
-        // ★ [중요] 이 기기는 이제 seatNum 자리를 쓰고 있다고 "전역" 설정
-        localStorage.setItem("device_active_seat", seatNum);
-
+        localStorage.setItem("device_active_seat", seatNum); // 기기 점유 설정
         login(inputId);
     });
 
+    // 2. 외출 버튼
     document.getElementById("btn-go-out").addEventListener("click", setOutStatus);
 
+    // 3. 복귀 버튼 (외출 종료)
     document.getElementById("btn-return").addEventListener("click", () => {
-        checkOutDurationAndProcess(); 
+        checkOutDurationAndProcess(); // 시간 초과했는지 검사
         setInStatus(); 
     });
 
-    document.getElementById("btn-leave").addEventListener("click", () => logout(true));
-
-    document.getElementById("btn-leave-out").addEventListener("click", () => {
-        checkOutDurationAndProcess();
-        if (currentId) logout(true);
+    // 4. 퇴실 버튼 (입실 중일 때) - [수정됨: 넛지 팝업 적용]
+    document.getElementById("btn-leave").addEventListener("click", () => {
+        const userCheck = confirm(
+            "잠깐! 퇴실하시겠습니까?\n\n" +
+            "당신의 '퇴실' 버튼 한 번이,\n" +
+            "시험 기간 친구에게는 큰 '기회'가 됩니다.\n\n" +
+            "정말 종료하시겠습니까?"
+        );
+        if (userCheck) logout(true);
     });
 
+    // 5. 바로 퇴실 버튼 (외출 중일 때) - [수정됨: 넛지 팝업 적용]
+    document.getElementById("btn-leave-out").addEventListener("click", () => {
+        checkOutDurationAndProcess(); // 경고 줄 건 주고 퇴실
+        if (currentId) {
+            const userCheck = confirm(
+                "외출 상태에서 바로 퇴실하시겠습니까?\n\n" +
+                "빈자리는 다음 학우를 위해 소중히 사용됩니다.\n" +
+                "정말 종료하시겠습니까?"
+            );
+            if (userCheck) logout(true);
+        }
+    });
+
+    // 6. 테스트 버튼
     document.getElementById("btn-test-add-time").addEventListener("click", () => {
         const outStartKey = `seat_${seatNum}_outStartTime`;
         let startTime = parseInt(localStorage.getItem(outStartKey));
         if (startTime) {
+            // 3시간 1분 전으로 시간 조작
             const newStartTime = startTime - (3 * 60 * 60 * 1000) - (60 * 1000); 
             localStorage.setItem(outStartKey, newStartTime);
-            alert("테스트: 외출 시작 시간을 3시간 전으로 변경했습니다.");
+            alert("테스트: 외출 시간을 강제로 3시간 늘렸습니다.");
         } else {
             alert("외출 상태가 아닙니다.");
         }
     });
 
-    // --- 함수들 ---
+
+    // ============================================================
+    // [함수 정의] 핵심 기능 구현
+    // ============================================================
+    
     function login(id) {
         currentId = id;
         idInputEl.value = "";
@@ -335,12 +370,11 @@
     }
 
     function logout(showAlert = false) {
-        // 좌석 정보 삭제
         localStorage.removeItem(`seat_${seatNum}_studentId`);
         localStorage.removeItem(`seat_${seatNum}_status`);
         localStorage.removeItem(`seat_${seatNum}_outStartTime`);
         
-        // ★ [중요] 기기 점유 정보 삭제 (이제 다른 좌석 앉을 수 있음)
+        // 기기 점유 해제
         localStorage.removeItem("device_active_seat");
         
         if (timerInterval) clearInterval(timerInterval);
@@ -349,7 +383,7 @@
         seatCard.style.display = "none";
         idCard.style.display = "block";
         
-        if (showAlert) alert("퇴실 처리되었습니다.");
+        if (showAlert) alert("퇴실 처리가 완료되었습니다.\n이용해 주셔서 감사합니다.");
     }
 
     function setInStatus(save = true) {
@@ -391,6 +425,8 @@
 
         const now = Date.now();
         const diff = now - startTime;
+        
+        // 시:분:초 계산
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
@@ -398,6 +434,7 @@
         
         timerText.textContent = `${fmt(hours)}:${fmt(minutes)}:${fmt(seconds)}`;
         
+        // 3시간 넘으면 빨간색 강조
         if (diff > WARNING_LIMIT_MS) {
             timerText.style.color = "red";
             timerText.style.fontWeight = "900";
@@ -416,6 +453,7 @@
         }
     }
 
+    // 블랙리스트 조회
     function getStudentBanInfo(id) {
         const banDateStr = localStorage.getItem(`student_${id}_banDate`);
         if (banDateStr) {
@@ -423,6 +461,7 @@
             if (new Date() < banDate) {
                 return { isBanned: true, date: banDate.toLocaleDateString() };
             } else {
+                // 기간 지났으면 해제
                 localStorage.removeItem(`student_${id}_banDate`);
                 localStorage.removeItem(`student_${id}_warnings`);
             }
@@ -430,6 +469,7 @@
         return { isBanned: false };
     }
 
+    // 경고 부여 로직
     function addWarning(id) {
         let warnings = parseInt(localStorage.getItem(`student_${id}_warnings`) || "0");
         warnings++;
@@ -457,7 +497,7 @@
         idErrorEl.textContent = msg;
         idErrorEl.style.display = "block";
     }
-</script>
 
+</script>
 </body>
 </html>
